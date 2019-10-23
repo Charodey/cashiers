@@ -2,13 +2,14 @@
 
 require_once __DIR__ . '/ICashier.php';
 
-class cashier implements ICashier
+class Cashier implements ICashier
 {
 	private const DOWNTIME_FOR_SLEEP = 2;
 
 	private $status = self::SLEEP_STATUS;
 
 	private
+		$name = null,
 		$pushTime = null,
 		$payTime = null;
 
@@ -16,10 +17,18 @@ class cashier implements ICashier
 		$downtime = 0,
 		$serviceTime = 0;
 
+	private $buyers = [];
+
 	function __construct(cashierOptions $options)
 	{
+		$this->name = $options->name;
 		$this->pushTime = $options->pushTime;
 		$this->payTime = $options->payTime;
+	}
+
+	public function getName()
+	{
+		return $this->name;
 	}
 
 	public function getStatus()
@@ -27,29 +36,30 @@ class cashier implements ICashier
 		return $this->status;
 	}
 
-	public function wake()
+	private function wake()
 	{
 		$this->status = static::WAKE_STATUS;
+		$this->downtime = 0;
 	}
 
-	public function sleep()
+	private function sleep()
 	{
 		$this->status = static::SLEEP_STATUS;
 	}
 
-	public function getProductTime(): int
+	private function getProductTime(): int
 	{
 		return $this->pushTime;
 	}
 
-	public function getPayTime(): int
+	private function getPayTime(): int
 	{
 		return $this->payTime;
 	}
 
-	public function addBuyer($buyer)
+	public function addBuyer(Buyer $buyer)
 	{
-		$this->downtime = 0;
+		$this->wake();
 		$this->buyers[] = $buyer;
 	}
 
@@ -57,13 +67,18 @@ class cashier implements ICashier
 	{
 		if ($this->buyers) {
 			$this->serviceTime++;
-			if ($this->serviceTime === ($this->getProductTime() * $this->buyers[0]) + $this->getPayTime()) {
+			if ($this->serviceTime === $this->getAllTimeForFirstBuyer()) {
 				array_shift($this->buyers);
 			}
 		} else {
 			$this->downtime++;
 			$this->checkForSleep();
 		}
+	}
+
+	private function getAllTimeForFirstBuyer(): int
+	{
+		return ($this->getProductTime() * $this->buyers[0]->getProductsCount()) + $this->getPayTime();
 	}
 
 	private function checkForSleep()
@@ -73,7 +88,7 @@ class cashier implements ICashier
 		}
 	}
 
-	public function getBuyersCount()
+	public function getBuyersCount(): int
 	{
 		return count($this->buyers);
 	}

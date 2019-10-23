@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . '/src/store.class.php';
+include __DIR__ . '/src/Store.class.php';
 
-$store = new store();
+$store = new Store();
 $store->run();
