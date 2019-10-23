@@ -9,6 +9,6 @@ interface ICashier
 	public function getStatus();
 	public function wake();
 	public function sleep();
-	public function getPunchTime(): int;
+	public function getProductTime(): int;
 	public function getPayTime(): int;
 }
