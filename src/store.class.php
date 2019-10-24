@@ -53,7 +53,7 @@ class Store
 			}
 			unset($cashier);
 
-			if ($time === 5) {
+			if ($time === 30) {
 				$working = false;
 			}
 			echo 'count newBuyers: ', count($newBuyers), PHP_EOL;

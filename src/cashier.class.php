@@ -69,6 +69,7 @@ class Cashier implements ICashier
 			$this->serviceTime++;
 			if ($this->serviceTime === $this->getAllTimeForFirstBuyer()) {
 				array_shift($this->buyers);
+				$this->serviceTime = 0;
 			}
 		} else {
 			$this->downtime++;

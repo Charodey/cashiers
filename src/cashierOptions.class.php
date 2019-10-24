@@ -2,8 +2,8 @@
 
 class cashierOptions
 {
-	private const PUSH_TIME = 5;
-	private const PAY_TIME = 12;
+	private const PUSH_TIME = 1;
+	private const PAY_TIME = 1;
 
 	public
 		$name = 'Cashier',

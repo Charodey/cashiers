@@ -2,7 +2,7 @@
 
 class Buyer
 {
-	private const MAX_PRODUCTS_COUNT = 20;
+	private const MAX_PRODUCTS_COUNT = 2;
 
 	private $productsCount = 0;
 
