@@ -9,28 +9,9 @@ class Store
 {
 	private const CASHIERS_COUNT = 3;
 	private const WAITING_BUYERS_LIMIT = 5;
-	private const WORK_TIME = 8 * 60;
+	private const WORK_TIME = 8 * 3600;
 
 	private $cashiers = [];
-
-	public function __toString()
-	{
-		$str = '';
-		print_r($this->cashiers);
-
-		return $str;
-	}
-
-	private function createCashier()
-	{
-		if (count($this->cashiers) < static::CASHIERS_COUNT) {
-			$options = (new CashierOptions())->setDefaultValues();
-			$this->cashiers[] = new Cashier($options);
-			return true;
-		}
-
-		return false;
-	}
 
 	public function run()
 	{
@@ -39,9 +20,8 @@ class Store
 		echo 'Store doors opening...', PHP_EOL;
 		while ($working) {
 			$time++;
-			echo PHP_EOL, 'time: ', $time, PHP_EOL;
 
-			if ($newBuyers = BuyerService::generateBuyers()) {
+			if ($newBuyers = BuyerService::generateBuyers($time, static::WORK_TIME)) {
 				foreach ($newBuyers as $buyer) {
 					$cashier = $this->getBetterCashier();
 					$cashier->addBuyer($buyer);
@@ -53,17 +33,46 @@ class Store
 			}
 			unset($cashier);
 
-			if ($time === 30) {
-				$working = false;
+			$this->removeSleepingCashiers();
+
+			if ($time % 3600 === 0) {
+				$this->printData($time);
 			}
-			echo 'count newBuyers: ', count($newBuyers), PHP_EOL;
-			echo 'count cashiers: ', count($this->cashiers), PHP_EOL;
-			foreach ($this->cashiers as $key => $cashier) {
-				echo 'all buyers: ', $cashier->getName(), ' ', $cashier->getBuyersCount(). PHP_EOL;
-			}
+
 			$time >= static::WORK_TIME && empty($this->cashiers) && $working = false;			
 		}
+
 		echo '... door closure', PHP_EOL;
+	}
+
+	private function printData($time)
+	{
+		echo PHP_EOL, 'Hour: ', $time/3600, PHP_EOL;
+		echo 'Cashiers count: ', count($this->cashiers), PHP_EOL;
+		foreach ($this->cashiers as $cashier) {
+			echo 'Buyers count on cashier: ', $cashier->getBuyersCount(), PHP_EOL;
+		}
+	}
+
+	private function createCashier()
+	{
+		if (count($this->cashiers) < static::CASHIERS_COUNT) {
+			$options = (new CashierOptions())->setDefaultValues();
+			$this->cashiers[] = new Cashier($options);
+			$this->cashiers = array_values($this->cashiers);
+			return true;
+		}
+
+		return false;
+	}
+
+	private function removeSleepingCashiers()
+	{
+		foreach ($this->cashiers as $key => $cashier) {
+			if ($cashier->isSleep()) {
+				unset($this->cashiers[$key]);
+			}
+		}
 	}
 
 	private function getBetterCashier(): ICashier
@@ -73,7 +82,9 @@ class Store
 			return $this->cashiers[0];
 		}
 
-		return $this->createCashier() ? $this->cashiers[count($this->cashiers)-1] : $this->cashiers[0];
+		return $this->createCashier()
+			? $this->cashiers[count($this->cashiers)-1]
+			: $this->cashiers[0];
 	}
 
 	private function sortBetterCashier()

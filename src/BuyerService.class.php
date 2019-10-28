@@ -2,18 +2,15 @@
 
 class BuyerService
 {
-	private const PEAK_BUYERS = 3;
-	private const GROWTH_RATE = 0.1;
+	private const
+		K = 20,
+		GEN_INTERVAL = 600; // seconds
 
-	private static $prevBuyersCount = 0;
-	private static $growthRate = 0;
-	private static $behind_peak = false;
-
-	public static function generateBuyers()
+	public static function generateBuyers(int $time, int $worktime): array
 	{
 		$newBuyers = [];
 		$i = 0;
-		$count = self::generateBuyersCount();
+		$count = self::generateBuyersCount($time, $worktime);
 		while ($i < $count) {
 			$i++;
 			$newBuyers[] = new Buyer();
@@ -22,30 +19,16 @@ class BuyerService
 		return $newBuyers;
 	}
 
-	private static function generateBuyersCount(): int
+	private static function generateBuyersCount(int $time, int $worktime): int
 	{
-		if (!self::$behind_peak) {
-			self::$growthRate = self::$growthRate + static::GROWTH_RATE;
-			if (self::$growthRate > 1) {
-				self::$growthRate = 1;
-			}
-			$min = self::$prevBuyersCount;
-			$max = round(self::PEAK_BUYERS * self::$growthRate);
-			if ($max > self::PEAK_BUYERS) {
-				$max = self::PEAK_BUYERS;
-			}
-		} else {
-			self::$growthRate = self::$growthRate - static::GROWTH_RATE;
-			if (self::$growthRate < 0) {
-				self::$growthRate = 0;
-			}
-			$min =  round(self::$prevBuyersCount * self::$growthRate);
-			$max = self::$prevBuyersCount;
+		if ($time % self::GEN_INTERVAL === 0) {
+			$tinterval = round($time / self::GEN_INTERVAL);
+			$ranges = $worktime / self::GEN_INTERVAL;
+			$count = round(sin($tinterval * (M_PI / $ranges)) * self::K);
+			return $count;
 		}
-		
-		self::$prevBuyersCount = mt_rand($min, $max);
-		!self::$behind_peak && self::$behind_peak = (self::$prevBuyersCount >= self::PEAK_BUYERS);
-		return self::$prevBuyersCount;
+
+		return 0;
 	}
 
 }

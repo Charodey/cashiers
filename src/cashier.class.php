@@ -4,14 +4,13 @@ require_once __DIR__ . '/ICashier.php';
 
 class Cashier implements ICashier
 {
-	private const DOWNTIME_FOR_SLEEP = 2;
-
-	private $status = self::SLEEP_STATUS;
+	private $status = self::STARTING_STATUS;
 
 	private
 		$name = null,
 		$pushTime = null,
-		$payTime = null;
+		$payTime = null,
+		$downtimeForSleep;
 
 	private
 		$downtime = 0,
@@ -24,9 +23,10 @@ class Cashier implements ICashier
 		$this->name = $options->name;
 		$this->pushTime = $options->pushTime;
 		$this->payTime = $options->payTime;
+		$this->downtimeForSleep = $options->downtimeForSleep;
 	}
 
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
@@ -34,6 +34,11 @@ class Cashier implements ICashier
 	public function getStatus()
 	{
 		return $this->status;
+	}
+
+	public function isSleep(): bool
+	{
+		return self::SLEEP_STATUS === $this->status;
 	}
 
 	private function wake()
@@ -84,7 +89,7 @@ class Cashier implements ICashier
 
 	private function checkForSleep()
 	{
-		if (static::DOWNTIME_FOR_SLEEP === $this->downtime) {
+		if ($this->downtimeForSleep <= $this->downtime) {
 			$this->sleep();
 		}
 	}
