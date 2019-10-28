@@ -24,4 +24,4 @@ BuyerService::K - коэффициент для генерации пользо�
 
 Запуск тестов (для версии php 7.1):
 
-`php phpunit.pchar tests/StoreTest.php`
+`php phpunit.phar tests/StoreTest.php`
