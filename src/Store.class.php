@@ -54,7 +54,7 @@ class Store
 		}
 	}
 
-	private function createCashier()
+	public function createCashier()
 	{
 		if (count($this->cashiers) < static::CASHIERS_COUNT) {
 			$options = (new CashierOptions())->setDefaultValues();
@@ -66,6 +66,11 @@ class Store
 		return false;
 	}
 
+	public function getCashiers()
+	{
+		return $this->cashiers;
+	}
+
 	private function removeSleepingCashiers()
 	{
 		foreach ($this->cashiers as $key => $cashier) {
@@ -75,7 +80,7 @@ class Store
 		}
 	}
 
-	private function getBetterCashier(): ICashier
+	public function getBetterCashier(): ICashier
 	{
 		$this->sortBetterCashier();
 		if ($this->cashiers && $this->cashiers[0]->getBuyersCount() < static::WAITING_BUYERS_LIMIT) {

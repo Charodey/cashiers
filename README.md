@@ -20,3 +20,8 @@ src/BuyerService.class.php
 
 BuyerService::GEN_INTERVAL - интервал для создания новой пачки пользователей.
 BuyerService::K - коэффициент для генерации пользователей.
+
+
+Запуск тестов (для версии php 7.1):
+
+`php phpunit.pchar tests/StoreTest.php`
