@@ -21,7 +21,7 @@ class Store
 		while ($working) {
 			$time++;
 
-			if ($newBuyers = BuyerService::generateBuyers($time, static::WORK_TIME)) {
+			if ($time < static::WORK_TIME && $newBuyers = BuyerService::generateBuyers($time, static::WORK_TIME)) {
 				foreach ($newBuyers as $buyer) {
 					$cashier = $this->getBetterCashier();
 					$cashier->addBuyer($buyer);
